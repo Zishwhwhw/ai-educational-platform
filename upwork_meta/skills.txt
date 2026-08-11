@@ -1,0 +1,1 @@
+Next.js, React, TypeScript, FastAPI, Python, PostgreSQL, Docker, AI Integration, Gemini API, REST API, Full-Stack Development
