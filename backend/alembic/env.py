@@ -1,7 +1,6 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 
@@ -16,13 +15,17 @@ if config.config_file_name is not None:
 
 import os
 import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from database import Base, DATABASE_URL
-import models  # import models to register them
+import app.models  # noqa: F401  — регистрирует все модели в metadata
+from app.core.config import get_settings
+from app.db.base import Base
 
 target_metadata = Base.metadata
-config.set_main_option("sqlalchemy.url", DATABASE_URL)
+
+# Alembic работает синхронно, поэтому берём psycopg-URL, а не asyncpg.
+config.set_main_option("sqlalchemy.url", get_settings().database_url_sync)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -68,9 +71,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
