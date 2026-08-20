@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import RequireAuth from "@/components/auth/RequireAuth";
+
 export const metadata: Metadata = { title: "OverCoding — Lesson" };
 
 /**
@@ -10,5 +12,9 @@ export const metadata: Metadata = { title: "OverCoding — Lesson" };
  * и занимали почти 600 пикселей на любой странице.
  */
 export default function LearnLayout({ children }: { children: React.ReactNode }) {
-  return <div className="flex h-screen flex-col overflow-hidden">{children}</div>;
+  return (
+    <RequireAuth>
+      <div className="flex h-screen flex-col overflow-hidden">{children}</div>
+    </RequireAuth>
+  );
 }

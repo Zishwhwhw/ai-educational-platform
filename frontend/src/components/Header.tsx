@@ -1,85 +1,109 @@
-// ==========================================
-// File: src/components/Header.tsx
-// Description: Header with user stats (Coins, Pts, Streak) and controls
-// Author: AI Agent
-// Created: 2026-08-02
-// ==========================================
-
 "use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
+/**
+ * Шапка приложения.
+ *
+ * Все показатели раньше были захардкожены — «450 Pts», «5 Days Streak»,
+ * аватар «S» — и не менялись, что бы пользователь ни делал. Теперь они
+ * приходят из сессии.
+ *
+ * Уведомления убраны: раньше это был выпадающий список из двух выдуманных
+ * сообщений. Настоящих уведомлений пока нет, а пустой колокольчик обещает
+ * функцию, которой не существует.
+ */
 
-import ThemeToggle from '@/components/ThemeToggle';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSyncExternalStore } from "react";
+
+import ThemeToggle from "@/components/ThemeToggle";
+import { API_BASE } from "@/lib/api";
+import {
+  clearSession,
+  getAuthServerSnapshot,
+  getAuthSnapshot,
+  getRefreshToken,
+  subscribeAuth,
+} from "@/lib/auth";
+
+function Stat({ icon, value, label }: { icon: string; value: number | string; label: string }) {
+  return (
+    <div
+      title={label}
+      className="flex items-center gap-1.5 rounded-lg border border-border bg-raised px-2.5 py-1.5 text-xs font-semibold text-text-2"
+    >
+      <span aria-hidden="true">{icon}</span>
+      <span className="text-text">{value}</span>
+      <span className="hidden sm:inline">{label}</span>
+    </div>
+  );
+}
 
 export default function Header() {
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const router = useRouter();
+  const user = useSyncExternalStore(subscribeAuth, getAuthSnapshot, getAuthServerSnapshot);
+
+  async function signOut() {
+    const token = getRefreshToken();
+    // Отзываем сессию на сервере, но выходим в любом случае: если запрос
+    // не прошёл, держать человека внутри против его воли неправильно.
+    if (token) {
+      await fetch(`${API_BASE}/auth/logout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: token }),
+      }).catch(() => undefined);
+    }
+    clearSession();
+    router.replace("/login");
+  }
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-border bg-surface px-6">
+    <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b border-border bg-surface px-6">
       <div className="flex min-w-0 items-center gap-3">
-        {/* Приветствие прячется, когда места нет: обрезка до «Wel...» бесполезна.
-            Настоящая причина тесноты — панель ИИ на 320px, которая по дизайн-
-            документу должна жить только на экране урока. Переносится в F3. */}
-        <h1 className="hidden text-lg font-bold text-text xl:block">Welcome back, Student</h1>
-        <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-accent/10 text-success border border-accent/20">
-          Regular (Lvl 2)
-        </span>
+        <h1 className="hidden truncate text-lg font-bold text-text xl:block">
+          {user ? `Welcome back, ${user.username}` : "OverCoding"}
+        </h1>
+        {user && (
+          <span className="shrink-0 rounded-full border border-accent/20 bg-accent/10 px-2.5 py-0.5 text-xs font-semibold text-accent">
+            {user.level}
+          </span>
+        )}
       </div>
 
-      <div className="flex items-center space-x-5">
-        {/* Streak */}
-        <div className="flex items-center space-x-1.5 bg-raised border border-border px-3 py-1.5 rounded-lg text-xs font-bold text-warning">
-          <span className="text-base animate-pulse">🔥</span>
-          <span>5 Days Streak</span>
-        </div>
-
-        {/* Coins */}
-        <div className="flex items-center space-x-1.5 bg-raised border border-border px-3 py-1.5 rounded-lg text-xs font-bold text-warning">
-          <span>💎</span>
-          <span>150 Coins</span>
-        </div>
-
-        {/* Points */}
-        <div className="flex items-center space-x-1.5 bg-raised border border-border px-3 py-1.5 rounded-lg text-xs font-bold text-success">
-          <span>🏆</span>
-          <span>450 Pts</span>
-        </div>
+      <div className="flex items-center gap-3">
+        {user && (
+          <>
+            <Stat icon="🔥" value={user.streak_days} label="streak" />
+            <Stat icon="💎" value={user.coins} label="coins" />
+            <Stat icon="🏆" value={user.points} label="pts" />
+          </>
+        )}
 
         <ThemeToggle />
 
-        {/* Notifications */}
-        <div className="relative">
-          <button
-            onClick={() => setNotificationsOpen(!notificationsOpen)}
-            className="w-9 h-9 rounded-lg bg-raised border border-border flex items-center justify-center text-text-2 hover:text-text transition-colors relative"
-          >
-            🔔
-            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-success"></span>
-          </button>
-
-          {notificationsOpen && (
-            <div className="absolute right-0 mt-2 w-72 bg-surface border border-border rounded-xl shadow-2xl p-4 text-xs z-50 space-y-3">
-              <div className="font-bold text-sm text-text flex justify-between">
-                <span>Notifications</span>
-                <span className="text-success font-normal cursor-pointer">Mark read</span>
-              </div>
-              <div className="space-y-2">
-                <div className="bg-raised p-2.5 rounded-lg text-text-2">
-                  🎉 Achievement unlocked: <span className="text-success font-semibold">First Steps</span>!
-                </div>
-                <div className="bg-raised p-2.5 rounded-lg text-text-2">
-                  ⚡ Clan rating updated: Your clan is rank #3!
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Profile Avatar */}
-        <Link href="/profile" className="w-9 h-9 rounded-xl bg-accent flex items-center justify-center font-bold text-text shadow-md hover:scale-105 transition-transform">
-          S
-        </Link>
+        {user ? (
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/profile`}
+              title={user.email}
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-sm font-bold text-accent-fg"
+            >
+              {user.username.slice(0, 1).toUpperCase()}
+            </Link>
+            <button
+              type="button"
+              onClick={signOut}
+              className="text-xs text-text-2 hover:text-text"
+            >
+              Sign out
+            </button>
+          </div>
+        ) : (
+          <Link href="/login" className="text-xs text-accent hover:underline">
+            Sign in
+          </Link>
+        )}
       </div>
     </header>
   );
