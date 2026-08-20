@@ -36,6 +36,7 @@ from app.api.routers import (
     notifications,
     peer_reviews,
     progress,
+    steps,
     store,
     streaks,
     submissions,
@@ -162,5 +163,6 @@ for _router in (
     peer_reviews,
     tasks,
     hints,
+    steps,
 ):
     app.include_router(_router.router)

@@ -57,6 +57,13 @@ class Lesson(Base):
     order = Column(Integer, default=0)
     module = relationship("Module", back_populates="lessons")
     tasks = relationship("Task", back_populates="lesson", cascade="all, delete-orphan")
+    steps = relationship(
+        "Step",
+        back_populates="lesson",
+        cascade="all, delete-orphan",
+        order_by="Step.ordering",
+        lazy="selectin",
+    )
     comments = relationship("Comment", back_populates="lesson")
 
 

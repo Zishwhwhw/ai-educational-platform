@@ -50,6 +50,10 @@ from app.models.social import (
     Notification,
     PrivateMessage,
 )
+from app.models.steps import (
+    Step,
+    StepAttempt,
+)
 from app.models.user import (
     User,
 )
@@ -76,6 +80,8 @@ __all__ = [
     "RefreshToken",
     "Role",
     "RoleEnum",
+    "Step",
+    "StepAttempt",
     "StoreItem",
     "Submission",
     "SubmissionResult",
