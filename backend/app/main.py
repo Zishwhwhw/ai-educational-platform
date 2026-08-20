@@ -29,6 +29,7 @@ from app.api.routers import (
     clans,
     courses,
     flashcards,
+    hints,
     leaderboard,
     lessons,
     messages,
@@ -160,5 +161,6 @@ for _router in (
     leaderboard,
     peer_reviews,
     tasks,
+    hints,
 ):
     app.include_router(_router.router)

@@ -87,6 +87,9 @@ class Task(Base):
     languages = relationship(
         "TaskLanguage", back_populates="task", cascade="all, delete-orphan", lazy="selectin"
     )
+    hints = relationship(
+        "TaskHint", back_populates="task", cascade="all, delete-orphan", lazy="selectin"
+    )
     test_cases = relationship(
         "TestCase",
         back_populates="task",

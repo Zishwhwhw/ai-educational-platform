@@ -91,3 +91,11 @@ export interface CourseOutline {
   /** Первое нерешённое задание — цель кнопки Continue. */
   next_task_id: number | null;
 }
+
+export interface HintState {
+  failed_attempts: number;
+  revealed_level: number;
+  next_level: number | null;
+  next_unlocks_after_failures: number | null;
+  next_reward_multiplier: number | null;
+}

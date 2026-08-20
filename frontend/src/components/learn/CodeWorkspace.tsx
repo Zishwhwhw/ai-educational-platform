@@ -4,9 +4,11 @@ import Editor, { type Monaco } from "@monaco-editor/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import Button from "@/components/ui/Button";
+import HintPanel from "@/components/learn/HintPanel";
 import TestResultsPanel from "@/components/learn/TestResultsPanel";
+import Tabs from "@/components/ui/Tabs";
 import { ApiError, api } from "@/lib/api";
-import type { RunResponse, SubmissionResponse, TestOutcome } from "@/lib/api-types";
+import type { HintState, RunResponse, SubmissionResponse, TestOutcome } from "@/lib/api-types";
 import { cn } from "@/lib/cn";
 
 /**
@@ -72,6 +74,17 @@ export default function CodeWorkspace({
   const [awarded, setAwarded] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submittedOnce, setSubmittedOnce] = useState(false);
+  const [lastSubmissionId, setLastSubmissionId] = useState<number | null>(null);
+  const [bottomTab, setBottomTab] = useState("tests");
+  const [hintState, setHintState] = useState<HintState | null>(null);
+
+  // Состояние лестницы перезапрашивается после каждой отправки и после
+  // раскрытия: от него зависит, какая ступень доступна и сколько она стоит.
+  const refreshHints = useCallback(() => {
+    api<HintState>(`/hints/task/${taskId}`)
+      .then(setHintState)
+      .catch(() => setHintState(null));
+  }, [taskId]);
 
   // Автосохранение с задержкой: сохранять на каждое нажатие клавиши незачем,
   // а потерять написанное — самое болезненное, что может сделать учебный продукт.
@@ -141,6 +154,8 @@ export default function CodeWorkspace({
       setCompileOutput(res.compile_output);
       setAwarded(res.points_awarded);
       setSubmittedOnce(true);
+      setLastSubmissionId(res.id);
+      refreshHints();
       if (res.status === "correct") onSolved?.(res);
     } catch (e) {
       setError(
@@ -153,7 +168,7 @@ export default function CodeWorkspace({
     } finally {
       setPhase("idle");
     }
-  }, [code, language, onSolved, taskId]);
+  }, [code, language, onSolved, refreshHints, taskId]);
 
   // Горячие клавиши регистрируются в Monaco, а не на документе: иначе они
   // срабатывали бы и когда фокус вне редактора.
@@ -223,7 +238,24 @@ export default function CodeWorkspace({
         </p>
       )}
 
-      <div className={cn("min-h-0 flex-1 overflow-hidden", outcomes.length === 0 && "flex-none")}>
+      <div className="border-b border-border px-2 py-1">
+        <Tabs
+          items={[
+            { id: "tests", label: "Tests", icon: "✓" },
+            { id: "hints", label: "Hints", icon: "💡" },
+          ]}
+          activeId={bottomTab}
+          onChange={setBottomTab}
+        />
+      </div>
+
+      <div
+        className={cn(
+          "min-h-0 flex-1 overflow-y-auto",
+          bottomTab === "hints" && "hidden",
+          outcomes.length === 0 && "flex-none",
+        )}
+      >
         <TestResultsPanel
           outcomes={outcomes}
           passedCount={passed}
@@ -237,6 +269,15 @@ export default function CodeWorkspace({
               ? `Run to check ${visibleTestCount} visible ${visibleTestCount === 1 ? "test" : "tests"}`
               : "Submit to check the hidden tests"
           }
+        />
+      </div>
+
+      <div className={cn("min-h-0 flex-1 overflow-y-auto", bottomTab === "tests" && "hidden")}>
+        <HintPanel
+          submissionId={lastSubmissionId}
+          points={points}
+          state={hintState}
+          onStateChange={refreshHints}
         />
       </div>
     </div>

@@ -69,6 +69,21 @@ class Settings(BaseSettings):
     execution_time_limit_ms: int = 5_000
     execution_memory_limit_mb: int = 128
 
+    # --- LLM ---
+    anthropic_api_key: str = ""
+    # По умолчанию самая способная модель. Для подсказок дешевле подошла бы
+    # Haiku, но выбор модели ради экономии — решение владельца продукта,
+    # а не умолчание библиотеки. Меняется одной переменной окружения.
+    llm_model: str = "claude-opus-5"
+    llm_timeout_s: float = 30.0
+    # Цены за миллион токенов, в долларах. В конфиге, а не в коде: меняются
+    # без пересборки, и по ним считается стоимость каждого вызова.
+    llm_input_price_per_mtok: float = 5.0
+    llm_output_price_per_mtok: float = 25.0
+    # Дневной потолок расходов на пользователя — иначе один человек может
+    # выбрать бюджет всей платформы.
+    llm_daily_budget_usd_per_user: float = 0.25
+
     # --- Redis ---
     redis_url: str = "redis://localhost:6379/0"
 

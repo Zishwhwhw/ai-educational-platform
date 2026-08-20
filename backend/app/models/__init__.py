@@ -29,6 +29,10 @@ from app.models.gamification import (
     UserAchievement,
     UserPurchase,
 )
+from app.models.hints import (
+    HintEvent,
+    TaskHint,
+)
 from app.models.integrity import (
     AntiFraudLog,
     Appeal,
@@ -61,6 +65,7 @@ __all__ = [
     "Course",
     "DoubleXPEvent",
     "Flashcard",
+    "HintEvent",
     "ItemType",
     "Lesson",
     "Module",
@@ -78,6 +83,7 @@ __all__ = [
     "SubscriptionEnum",
     "Task",
     "TaskDifficulty",
+    "TaskHint",
     "TaskLanguage",
     "TestCase",
     "User",

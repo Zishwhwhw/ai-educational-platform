@@ -26,6 +26,7 @@ dependencies = [
     "httpx>=0.28,<0.29",
     # observability
     "structlog>=24.4,<26.0",
+    "anthropic>=0.125.0",
 ]
 
 [project.optional-dependencies]
