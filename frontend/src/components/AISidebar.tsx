@@ -43,19 +43,19 @@ export default function AISidebar() {
   };
 
   return (
-    <aside className="w-80 bg-slate-900 border-l border-slate-800 p-4 hidden lg:flex flex-col h-screen">
-      <div className="text-lg font-bold text-emerald-400 mb-4 flex items-center">
+    <aside className="w-80 bg-surface border-l border-border p-4 hidden lg:flex flex-col h-screen">
+      <div className="text-lg font-bold text-success mb-4 flex items-center">
         <span className="mr-2">✨</span> AI Mentor
       </div>
       
-      <div className="flex-1 bg-slate-950 rounded-lg border border-slate-800 p-4 overflow-y-auto mb-4 flex flex-col space-y-4">
+      <div className="flex-1 bg-bg rounded-lg border border-border p-4 overflow-y-auto mb-4 flex flex-col space-y-4">
         {messages.map((msg, idx) => (
-          <div key={idx} className={`p-3 rounded-lg text-sm max-w-[90%] ${msg.role === 'ai' ? 'bg-slate-800 text-emerald-100 self-start' : 'bg-emerald-600 text-white self-end'}`}>
+          <div key={idx} className={`p-3 rounded-lg text-sm max-w-[90%] ${msg.role === 'ai' ? 'bg-raised text-text self-start' : 'bg-accent text-text self-end'}`}>
             {msg.text}
           </div>
         ))}
         {isLoading && (
-          <div className="p-3 rounded-lg text-sm max-w-[90%] bg-slate-800 text-slate-400 self-start flex space-x-1">
+          <div className="p-3 rounded-lg text-sm max-w-[90%] bg-raised text-text-2 self-start flex space-x-1">
             <span className="animate-bounce">.</span>
             <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>.</span>
             <span className="animate-bounce" style={{ animationDelay: '0.4s' }}>.</span>
@@ -70,7 +70,7 @@ export default function AISidebar() {
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Prompt AI..." 
           disabled={isLoading}
-          className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50" 
+          className="w-full bg-raised border border-border rounded-lg px-4 py-3 focus:outline-none focus:border-accent disabled:opacity-50" 
         />
       </form>
     </aside>
