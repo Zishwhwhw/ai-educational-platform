@@ -99,3 +99,52 @@ export interface HintState {
   next_unlocks_after_failures: number | null;
   next_reward_multiplier: number | null;
 }
+
+export type StepType =
+  | "text"
+  | "video"
+  | "choice_single"
+  | "choice_multiple"
+  | "input_string"
+  | "input_number"
+  | "matching"
+  | "ordering"
+  | "code";
+
+export interface StepOption {
+  id: string;
+  text: string;
+}
+
+/** Публичная часть шага. Правильные ответы сюда не попадают. */
+export interface StepContent {
+  markdown?: string;
+  question?: string;
+  url?: string;
+  placeholder?: string;
+  unit?: string;
+  options?: StepOption[];
+  items?: StepOption[];
+  left?: StepOption[];
+  right?: StepOption[];
+  task_id?: number;
+}
+
+export interface LessonStep {
+  id: number;
+  type: StepType;
+  ordering: number;
+  points_value: number;
+  content: StepContent;
+  is_completed: boolean;
+  best_score: number;
+  attempts: number;
+}
+
+export interface StepAnswerResponse {
+  is_correct: boolean;
+  score: number;
+  points_awarded: number;
+  attempts: number;
+  detail: Record<string, number> | null;
+}

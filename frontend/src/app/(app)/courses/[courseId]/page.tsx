@@ -146,15 +146,18 @@ function LessonRow({ lesson }: { lesson: LessonOutline }) {
           </span>
         )}
 
-        {lesson.tasks.length > 0 ? (
+        {/* Урок открывается всегда: в нём могут быть шаги без заданий —
+            теория, квизы, сопоставления. Ссылка на задание отдельно. */}
+        <Link href={`/lessons/${lesson.id}`} className="shrink-0 text-xs text-accent hover:underline">
+          {done ? "Review" : "Open"}
+        </Link>
+        {lesson.tasks.length > 0 && (
           <Link
             href={`/tasks/${lesson.tasks.find((t) => !t.is_solved)?.id ?? lesson.tasks[0].id}`}
-            className="shrink-0 text-xs text-accent hover:underline"
+            className="shrink-0 text-xs text-text-2 hover:text-text"
           >
-            {solved === lesson.tasks.length ? "Review" : "Solve"}
+            code
           </Link>
-        ) : (
-          <span className="shrink-0 text-xs text-text-muted">no tasks</span>
         )}
       </div>
     </li>
