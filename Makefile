@@ -75,5 +75,13 @@ fmt: ## отформатировать код
 	$(BACKEND) uv run ruff format .
 	$(BACKEND) uv run ruff check --fix .
 
+.PHONY: content
+content: ## загрузить курсы из репозитория в базу (пересоздаёт курс)
+	$(BACKEND) uv run python -c "from app.db.session import SessionLocal; from app.content.loader import load_all; [print(s) for s in load_all(SessionLocal())]"
+
+.PHONY: content-verify
+content-verify: ## прогнать эталонные решения через песочницу (нужна сеть, минуты)
+	$(BACKEND) RUN_CONTENT_INTEGRATION=1 uv run pytest tests/test_content.py -q -k reference
+
 .PHONY: check
 check: lint test ## всё, что проверяет CI

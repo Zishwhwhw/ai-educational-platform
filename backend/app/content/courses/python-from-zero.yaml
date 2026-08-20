@@ -349,3 +349,277 @@ modules:
                 - { id: b, text: "greater than or equal" }
                 - { id: c, text: "equal" }
             grading: { pairs: { "1": a, "2": b, "3": c } }
+
+  # ─────────────────────────────────────────────────────────────────
+  - title: Repeating work
+    lessons:
+      - title: The for loop
+        steps:
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                A `for` loop walks over a sequence, one item at a time:
+
+                    for letter in "abc":
+                        print(letter)
+
+                `range(n)` produces the numbers 0 to n-1 — note that `n` itself
+                is not included:
+
+                    for i in range(3):
+                        print(i)      # 0, then 1, then 2
+          - type: input_number
+            points: 10
+            content:
+              question: How many numbers does range(5) produce?
+            grading: { value: 5, tolerance: 0 }
+          - type: choice_single
+            points: 10
+            content:
+              question: What is the last number produced by range(1, 5)?
+              options:
+                - { id: a, text: "5" }
+                - { id: b, text: "4" }
+                - { id: c, text: "6" }
+            grading: { correct: b }
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                `range` takes up to three arguments, like a slice:
+
+                    range(5)         # 0 1 2 3 4
+                    range(2, 5)      # 2 3 4        — start included, stop excluded
+                    range(0, 10, 3)  # 0 3 6 9      — with a step
+        tasks:
+          - prompt: |
+              Read an integer n and print the sum of all integers from 1 to n
+              inclusive.
+
+              n is always at least 1.
+            points: 30
+            difficulty: easy
+            languages:
+              - name: python
+                starter: "import sys\n\nn = int(sys.stdin.read())\n"
+                solution: |
+                  import sys
+                  n = int(sys.stdin.read())
+                  print(sum(range(1, n + 1)))
+            tests:
+              - { name: five, stdin: "5", stdout: "15" }
+              - { name: one, stdin: "1", stdout: "1", hidden: true, weight: 2 }
+              - { name: hundred, stdin: "100", stdout: "5050", hidden: true }
+            hints:
+              - { symptom: one, text: "Does your range include n itself when n is 1?" }
+              - text: "range(1, n) stops before n. You need one more."
+
+      - title: while and control flow
+        steps:
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                Use `while` when you do not know the number of repetitions
+                in advance:
+
+                    n = 10
+                    while n > 1:
+                        n = n // 2
+
+                Two keywords change the flow inside any loop:
+
+                    break      # leave the loop immediately
+                    continue   # skip to the next iteration
+          - type: choice_single
+            points: 10
+            content:
+              question: What is the difference between break and continue?
+              options:
+                - { id: a, text: "break leaves the loop, continue skips to the next iteration" }
+                - { id: b, text: "break skips one iteration, continue leaves the loop" }
+                - { id: c, text: "They are the same, break is just older" }
+            grading: { correct: a }
+          - type: choice_multiple
+            points: 15
+            content:
+              question: Which of these will loop forever?
+              options:
+                - { id: a, text: "while True: pass" }
+                - { id: b, text: "n = 5\nwhile n > 0: n -= 1" }
+                - { id: c, text: "n = 5\nwhile n > 0: print(n)" }
+                - { id: d, text: "for i in range(1000000): pass" }
+            grading: { correct: [a, c] }
+          - type: ordering
+            points: 15
+            content:
+              question: Order what happens in one iteration of a while loop
+              items:
+                - { id: a, text: "The condition is evaluated" }
+                - { id: b, text: "The body runs, if the condition was true" }
+                - { id: c, text: "Control returns to the condition" }
+            grading: { order: [a, b, c] }
+        tasks:
+          - prompt: |
+              Read an integer n and print how many times it can be divided
+              by 2 before it becomes 1 or less.
+
+              For 8 the answer is 3: 8 to 4, 4 to 2, 2 to 1.
+            points: 30
+            difficulty: medium
+            languages:
+              - name: python
+                starter: "import sys\n\nn = int(sys.stdin.read())\n"
+                solution: |
+                  import sys
+                  n = int(sys.stdin.read())
+                  steps = 0
+                  while n > 1:
+                      n //= 2
+                      steps += 1
+                  print(steps)
+            tests:
+              - { name: eight, stdin: "8", stdout: "3" }
+              - { name: one, stdin: "1", stdout: "0", hidden: true, weight: 2 }
+              - { name: seven, stdin: "7", stdout: "2", hidden: true, weight: 2 }
+            hints:
+              - { symptom: one, text: "What should the answer be when n is already 1?" }
+              - { symptom: seven, text: "7 // 2 is 3, not 3.5 — integer division rounds down." }
+
+  # ─────────────────────────────────────────────────────────────────
+  - title: Collections
+    lessons:
+      - title: Lists
+        steps:
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                A list holds an ordered sequence of values and can be changed
+                in place:
+
+                    nums = [3, 1, 2]
+                    nums.append(4)     # [3, 1, 2, 4]
+                    nums.sort()        # [1, 2, 3, 4]
+                    len(nums)          # 4
+                    nums[0]            # 1
+          - type: choice_single
+            points: 10
+            content:
+              question: What does nums.sort() return?
+              options:
+                - { id: a, text: "A new sorted list" }
+                - { id: b, text: "None — it sorts the list in place" }
+                - { id: c, text: "The first element" }
+            grading: { correct: b }
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                This trips up nearly everyone once:
+
+                    nums = [3, 1, 2]
+                    result = nums.sort()   # result is None!
+                    result = sorted(nums)  # this returns a new list
+
+                Methods that change an object in place return `None`. Functions
+                that build a new object return it.
+          - type: matching
+            points: 15
+            content:
+              question: Match each call to what it returns
+              left:
+                - { id: "1", text: "nums.sort()" }
+                - { id: "2", text: "sorted(nums)" }
+                - { id: "3", text: "nums.append(4)" }
+              right:
+                - { id: a, text: "None" }
+                - { id: b, text: "a new sorted list" }
+                - { id: c, text: "None, list is one longer" }
+            grading: { pairs: { "1": a, "2": b, "3": c } }
+        tasks:
+          - prompt: |
+              Read a line of whitespace-separated integers and print them
+              sorted in ascending order, separated by single spaces.
+            points: 30
+            difficulty: easy
+            languages:
+              - name: python
+                starter: "import sys\n\n"
+                solution: |
+                  import sys
+                  nums = sorted(int(x) for x in sys.stdin.read().split())
+                  print(" ".join(str(n) for n in nums))
+            tests:
+              - { name: unsorted, stdin: "3 1 2", stdout: "1 2 3" }
+              - { name: already sorted, stdin: "1 2 3", stdout: "1 2 3", hidden: true }
+              - { name: negatives, stdin: "5 -1 0", stdout: "-1 0 5", hidden: true, weight: 2 }
+            hints:
+              - text: "join() needs strings, not numbers — convert before joining."
+
+      - title: Dictionaries
+        steps:
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                A dictionary maps keys to values:
+
+                    ages = {"Ada": 36, "Alan": 41}
+                    ages["Ada"]           # 36
+                    ages["Grace"] = 45    # adds a new pair
+                    "Ada" in ages         # True
+
+                Looking up a missing key raises `KeyError`. Use `get` when
+                absence is normal:
+
+                    ages.get("Nobody", 0)   # 0 instead of an error
+          - type: choice_single
+            points: 10
+            content:
+              question: What happens on ages["Nobody"] if the key is missing?
+              options:
+                - { id: a, text: "Returns None" }
+                - { id: b, text: "Raises KeyError" }
+                - { id: c, text: "Returns 0" }
+            grading: { correct: b }
+          - type: input_string
+            points: 10
+            content:
+              question: Which dict method returns a default instead of raising?
+              placeholder: method name
+            grading: { answers: ["get", "get()", ".get", ".get()"] }
+          - type: choice_multiple
+            points: 15
+            content:
+              question: Which can be used as a dictionary key?
+              options:
+                - { id: a, text: "a string" }
+                - { id: b, text: "a number" }
+                - { id: c, text: "a tuple of numbers" }
+                - { id: d, text: "a list" }
+            grading: { correct: [a, b, c] }
+        tasks:
+          - prompt: |
+              Read a line of whitespace-separated words and print how many
+              times the most frequent word appears.
+            points: 40
+            difficulty: medium
+            languages:
+              - name: python
+                starter: "import sys\n\n"
+                solution: |
+                  import sys
+                  words = sys.stdin.read().split()
+                  counts = {}
+                  for w in words:
+                      counts[w] = counts.get(w, 0) + 1
+                  print(max(counts.values()))
+            tests:
+              - { name: repeated, stdin: "a b a c a", stdout: "3" }
+              - { name: all unique, stdin: "a b c", stdout: "1", hidden: true }
+              - { name: single word, stdin: "hello", stdout: "1", hidden: true, weight: 2 }
+            hints:
+              - { symptom: single word, text: "Does your code work when there is only one word?" }
+              - text: "counts.get(w, 0) + 1 avoids a KeyError on the first occurrence."
