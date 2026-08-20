@@ -1,0 +1,351 @@
+# OverCoding — Python from Zero
+#
+# Курс живёт в репозитории, а не в базе: правку формулировки видно в истории,
+# а сломанный тест-кейс роняет сборку, а не всплывает у ученика.
+#
+# Принцип раскладки шагов: теория короткая, сразу за ней проверка понимания,
+# и только потом код. Три страницы теории подряд человек пролистывает.
+
+slug: python-from-zero
+title: Python from Zero
+description: >-
+  Learn Python by writing code from the very first lesson. No prior experience
+  needed — every concept is followed by a task you solve yourself.
+language: python
+difficulty: beginner
+preinstalled: true
+target_points: 1700
+
+modules:
+  # ─────────────────────────────────────────────────────────────────
+  - title: First steps
+    lessons:
+      - title: Printing output
+        steps:
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                Every program communicates. In Python the simplest way is `print`.
+
+                    print("Hello")
+
+                `print` writes its argument to standard output and adds a newline.
+                Quotes mark a piece of text — a *string*. Without them Python would
+                look for a variable named Hello and fail.
+          - type: choice_single
+            points: 10
+            content:
+              question: What does print("2 + 2") output?
+              options:
+                - { id: a, text: "4" }
+                - { id: b, text: "2 + 2" }
+                - { id: c, text: "An error" }
+            grading: { correct: b }
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                Quotes turn anything into text. Remove them and Python evaluates
+                the expression instead:
+
+                    print(2 + 2)     # 4
+                    print("2 + 2")   # 2 + 2
+        tasks:
+          - prompt: |
+              Print exactly this line:
+
+              Hello, OverCoding!
+            points: 20
+            difficulty: easy
+            languages:
+              - name: python
+                starter: "# Print the greeting\n"
+                solution: 'print("Hello, OverCoding!")'
+            tests:
+              - { name: greeting, stdin: "", stdout: "Hello, OverCoding!" }
+            hints:
+              - text: The text must match exactly, including the comma and the exclamation mark.
+
+      - title: Variables
+        steps:
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                A variable is a name for a value.
+
+                    age = 20
+                    name = "Ada"
+
+                Python figures out the type on its own — you never declare it.
+                The `=` sign means "store this value under this name", not
+                "is equal to".
+          - type: choice_single
+            points: 10
+            content:
+              question: After `x = 5` and then `x = 7`, what does `print(x)` output?
+              options:
+                - { id: a, text: "5" }
+                - { id: b, text: "7" }
+                - { id: c, text: "5 7" }
+            grading: { correct: b }
+          - type: input_string
+            points: 10
+            content:
+              question: What symbol assigns a value to a variable in Python?
+              placeholder: "one character"
+            grading: { answers: ["=", "equals", "equal sign"] }
+
+      - title: Reading input
+        steps:
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                `input()` reads one line from standard input and returns it
+                **as a string** — always, even if the user typed digits.
+
+                    line = input()
+                    print(line)
+
+                To do arithmetic you must convert first: `int(line)`.
+          - type: choice_single
+            points: 10
+            content:
+              question: The user types 5. What is the type of `input()`'s result?
+              options:
+                - { id: a, text: "int" }
+                - { id: b, text: "str" }
+                - { id: c, text: "It depends on what was typed" }
+            grading: { correct: b }
+        tasks:
+          - prompt: |
+              Read one line of whitespace-separated integers from standard input
+              and print their sum.
+
+              The input always contains at least one number.
+            points: 40
+            difficulty: easy
+            languages:
+              - name: python
+                starter: "import sys\n\n"
+                solution: |
+                  import sys
+                  print(sum(int(x) for x in sys.stdin.read().split()))
+            tests:
+              - { name: two numbers, stdin: "1 2", stdout: "3" }
+              - { name: four numbers, stdin: "1 2 3 4", stdout: "10" }
+              - { name: single number, stdin: "7", stdout: "7", hidden: true, weight: 2 }
+              - { name: negatives, stdin: "-5 10 -2", stdout: "3", hidden: true, weight: 2 }
+            hints:
+              - { symptom: single number, text: "What does your code do when the input has exactly one number?" }
+              - { symptom: negatives, text: "A minus sign is part of the number — int() handles it." }
+              - text: "Split the line first, then convert each piece."
+
+  # ─────────────────────────────────────────────────────────────────
+  - title: Numbers and text
+    lessons:
+      - title: Arithmetic
+        steps:
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                Python has two division operators:
+
+                    7 / 2    # 3.5  — always a float
+                    7 // 2   # 3    — floor division, drops the remainder
+                    7 % 2    # 1    — the remainder itself
+
+                `//` and `%` come as a pair: `a == (a // b) * b + a % b`.
+          - type: input_number
+            points: 10
+            content:
+              question: What is 17 // 5?
+            grading: { value: 3, tolerance: 0 }
+          - type: input_number
+            points: 10
+            content:
+              question: What is 17 % 5?
+            grading: { value: 2, tolerance: 0 }
+          - type: choice_single
+            points: 10
+            content:
+              question: What is the type of `10 / 2`?
+              options:
+                - { id: a, text: "int, because both operands are ints" }
+                - { id: b, text: "float, because / always produces a float" }
+            grading: { correct: b }
+        tasks:
+          - prompt: |
+              Read two integers on one line and print their product.
+            points: 30
+            difficulty: easy
+            languages:
+              - name: python
+                starter: "import sys\n\n"
+                solution: |
+                  import sys
+                  a, b = (int(x) for x in sys.stdin.read().split())
+                  print(a * b)
+            tests:
+              - { name: small, stdin: "3 4", stdout: "12" }
+              - { name: with zero, stdin: "0 99", stdout: "0", hidden: true }
+              - { name: negative, stdin: "-3 4", stdout: "-12", hidden: true }
+
+      - title: Working with strings
+        steps:
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                Strings support useful operations out of the box:
+
+                    s = "Python"
+                    len(s)        # 6
+                    s.upper()     # "PYTHON"
+                    s[0]          # "P"   — indexing starts at zero
+                    s[-1]         # "n"   — negative counts from the end
+                    s[1:4]        # "yth" — a slice: from 1 up to but not including 4
+          - type: input_string
+            points: 10
+            content:
+              question: What does "hello"[1] return?
+              placeholder: one character
+            grading: { answers: ["e"] }
+          - type: choice_multiple
+            points: 15
+            content:
+              question: Which of these are true about Python strings?
+              options:
+                - { id: a, text: "Indexing starts at 0" }
+                - { id: b, text: "Negative indices count from the end" }
+                - { id: c, text: "You can change a character with s[0] = 'X'" }
+                - { id: d, text: "len(s) gives the number of characters" }
+            grading: { correct: [a, b, d] }
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                Strings are **immutable**: `s[0] = "X"` raises an error. Methods
+                like `upper()` do not change the string — they return a new one.
+
+                    s = "abc"
+                    s.upper()     # returns "ABC"
+                    print(s)      # still "abc"
+        tasks:
+          - prompt: |
+              Read one line and print it reversed.
+            points: 30
+            difficulty: easy
+            languages:
+              - name: python
+                starter: "import sys\n\n"
+                solution: |
+                  import sys
+                  print(sys.stdin.readline().rstrip("\n")[::-1])
+            tests:
+              - { name: word, stdin: "python", stdout: "nohtyp" }
+              - { name: sentence, stdin: "ab cd", stdout: "dc ba", hidden: true }
+              - { name: single char, stdin: "x", stdout: "x", hidden: true }
+            hints:
+              - text: "A slice with a step of -1 walks the string backwards."
+
+  # ─────────────────────────────────────────────────────────────────
+  - title: Making decisions
+    lessons:
+      - title: if and else
+        steps:
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                A branch runs only when its condition is true:
+
+                    if temperature > 30:
+                        print("hot")
+                    elif temperature > 15:
+                        print("warm")
+                    else:
+                        print("cold")
+
+                Indentation is not style — it *is* the syntax. Everything indented
+                under `if` belongs to it. Python has no braces.
+          - type: choice_single
+            points: 10
+            content:
+              question: What happens if you indent inconsistently inside a block?
+              options:
+                - { id: a, text: "Python warns but runs the code" }
+                - { id: b, text: "Python raises IndentationError" }
+                - { id: c, text: "Nothing — indentation is just style" }
+            grading: { correct: b }
+          - type: ordering
+            points: 15
+            content:
+              question: Order the branches as Python checks them
+              items:
+                - { id: a, text: "if" }
+                - { id: b, text: "elif" }
+                - { id: c, text: "else" }
+            grading: { order: [a, b, c] }
+        tasks:
+          - prompt: |
+              Read one integer and print:
+
+              positive — if it is greater than zero
+              negative — if it is less than zero
+              zero — if it is exactly zero
+            points: 30
+            difficulty: easy
+            languages:
+              - name: python
+                starter: "import sys\n\nn = int(sys.stdin.read())\n"
+                solution: |
+                  import sys
+                  n = int(sys.stdin.read())
+                  print("positive" if n > 0 else "negative" if n < 0 else "zero")
+            tests:
+              - { name: positive, stdin: "5", stdout: "positive" }
+              - { name: negative, stdin: "-3", stdout: "negative" }
+              - { name: zero, stdin: "0", stdout: "zero", hidden: true, weight: 2 }
+            hints:
+              - { symptom: zero, text: "Zero is neither positive nor negative — is it covered by a branch of its own?" }
+
+      - title: Comparisons and logic
+        steps:
+          - type: text
+            points: 5
+            content:
+              markdown: |
+                Comparisons return `True` or `False`:
+
+                    ==  equal          !=  not equal
+                    <   less than      <=  less or equal
+
+                Combine them with `and`, `or`, `not`. Python also allows chaining:
+
+                    if 0 < x < 10:   # the same as 0 < x and x < 10
+          - type: choice_single
+            points: 10
+            content:
+              question: What is the difference between = and ==?
+              options:
+                - { id: a, text: "None, they are interchangeable" }
+                - { id: b, text: "= assigns a value, == compares two values" }
+                - { id: c, text: "= compares, == assigns" }
+            grading: { correct: b }
+          - type: matching
+            points: 15
+            content:
+              question: Match each operator to what it means
+              left:
+                - { id: "1", text: "!=" }
+                - { id: "2", text: ">=" }
+                - { id: "3", text: "==" }
+              right:
+                - { id: a, text: "not equal" }
+                - { id: b, text: "greater than or equal" }
+                - { id: c, text: "equal" }
+            grading: { pairs: { "1": a, "2": b, "3": c } }

@@ -18,6 +18,9 @@ from app.db.base import Base
 class Course(Base):
     __tablename__ = "courses"
     id = Column(Integer, primary_key=True, index=True)
+    # Устойчивый идентификатор для курсов, живущих в репозитории как файлы.
+    # Без него повторная загрузка контента создавала бы дубликаты.
+    slug = Column(String(80), unique=True, nullable=True, index=True)
     title = Column(String, index=True)
     description = Column(Text)
     language = Column(String, default="python")
