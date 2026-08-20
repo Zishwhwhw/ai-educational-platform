@@ -95,7 +95,7 @@ class TestValidatorCatchesBrokenContent:
                 }
             ],
         }
-        with pytest.raises(ContentError, match="needs grading.correct"):
+        with pytest.raises(ContentError, match=r"needs grading\.correct"):
             validate(doc)
 
     def test_correct_answer_not_among_options(self) -> None:
@@ -183,9 +183,10 @@ async def test_reference_solutions_pass_their_own_tests(path: pathlib.Path) -> N
                         1e-6,
                     )
                     if not ok:
+                        want = str(case.get("stdout", "")).strip()
                         failures.append(
                             f"{lesson['title']} / {case.get('name')}: "
-                            f"got {result.stdout.strip()!r}, want {str(case.get('stdout')).strip()!r}"
+                            f"got {result.stdout.strip()!r}, want {want!r}"
                         )
 
     assert not failures, "эталон не проходит свои тесты:\n" + "\n".join(failures)
