@@ -12,11 +12,11 @@ import React, { useEffect, useState } from 'react';
 interface LeaderboardUser {
   rank: number;
   user_id: number;
-  username: str;
+  username: string;
   points: number;
-  level: str;
-  avatar_url: str;
-  tier?: str;
+  level: string;
+  avatar_url: string;
+  tier?: string;
   discount?: number;
   is_shadowbanned?: boolean;
 }
