@@ -1,24 +1,80 @@
-version: '3.8'
+name: overcoding
+
+x-backend-env: &backend-env
+  DATABASE_URL: postgresql+asyncpg://overcoding:${POSTGRES_PASSWORD:-devpassword}@db:5432/overcoding
+  DATABASE_URL_SYNC: postgresql+psycopg://overcoding:${POSTGRES_PASSWORD:-devpassword}@db:5432/overcoding
+  REDIS_URL: redis://redis:6379/0
+  SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required — copy .env.example to .env}
+  ENVIRONMENT: ${ENVIRONMENT:-development}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
 
 services:
   db:
-    image: postgres:15-alpine
+    image: postgres:18-alpine
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: aieducation
+      POSTGRES_USER: overcoding
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpassword}
+      POSTGRES_DB: overcoding
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U overcoding -d overcoding"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     restart: unless-stopped
 
   redis:
     image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment: *backend-env
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app
+          ignore: [.venv/, __pycache__/]
+        - action: rebuild
+          path: ./backend/pyproject.toml
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    # Grading, AI jobs and scheduled tasks run here, never in the API process.
+    command: ["arq", "app.worker.WorkerSettings"]
+    environment: *backend-env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles: ["worker"]      # not started until the queue exists (day 20+)
     restart: unless-stopped
 
 volumes:

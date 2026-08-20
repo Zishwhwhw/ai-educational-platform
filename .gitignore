@@ -1,6 +1,30 @@
+# зависимости
 node_modules/
-.next/
+.venv/
 venv/
 __pycache__/
-*.db
+*.py[cod]
+
+# сборка
+.next/
+dist/
+build/
+*.egg-info/
+
+# окружение и данные
 .env
+.env.local
+*.db
+*.sqlite3
+
+# инструменты
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ОС и редакторы
+.DS_Store
+.idea/
+.vscode/
